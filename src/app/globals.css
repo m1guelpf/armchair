@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		--background: theme(colors.white);
+		--foreground: theme(colors.neutral.800);
+
+		--muted: theme(colors.neutral.200);
+		--muted-foreground: theme(colors.neutral.500);
+
+		--popover: theme(colors.white);
+		--popover-foreground: theme(colors.neutral.800);
+
+		--card: theme(colors.white);
+		--card-foreground: theme(colors.neutral.900);
+
+		--border: theme(colors.neutral.200);
+		--input: theme(colors.neutral.200);
+
+		--primary: theme(colors.black);
+		--primary-foreground: theme(colors.neutral.100);
+
+		--secondary: theme(colors.neutral.200);
+		--secondary-foreground: theme(colors.neutral.800);
+
+		--accent: theme(colors.neutral.100);
+		--accent-foreground: theme(colors.neutral.900);
+
+		--destructive: theme(colors.red.300);
+		--destructive-foreground: theme(colors.neutral.900);
+
+		--ring: theme(colors.neutral.200);
+
+		--radius: 0.5rem;
+	}
+
+	.dark {
+		--background: theme(colors.neutral.900);
+		--foreground: theme(colors.neutral.100);
+
+		--muted: theme(colors.neutral.900);
+		--muted-foreground: theme(colors.neutral.500);
+
+		--popover: theme(colors.black);
+		--popover-foreground: theme(colors.neutral.100);
+
+		--card: theme(colors.black);
+		--card-foreground: theme(colors.neutral.100);
+
+		--border: theme(colors.neutral.800);
+		--input: theme(colors.neutral.800);
+
+		--primary: theme(colors.neutral.100);
+		--primary-foreground: theme(colors.neutral.950);
+
+		--secondary: theme(colors.neutral.900);
+		--secondary-foreground: theme(colors.neutral.100);
+
+		--accent: theme(colors.neutral.900);
+		--accent-foreground: theme(colors.neutral.100);
+
+		--destructive: theme(colors.red.900);
+		--destructive-foreground: theme(colors.neutral.950);
+
+		--ring: theme(colors.neutral.600);
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+
+	body {
+		@apply bg-background text-foreground;
+		font-feature-settings: 'rlig' 1, 'calt' 1;
+	}
+}
+
+[aria-label='Switch Networks'] {
+	@apply !hidden;
+}

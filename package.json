@@ -1,0 +1,61 @@
+{
+	"name": "armchair",
+	"version": "0.1.0",
+	"scripts": {
+		"dev": "prisma generate && next dev",
+		"format": "prettier \"src/**/*.{css,js,json,jsx,ts,tsx}\"",
+		"build": "prisma generate && prisma db push && next build",
+		"format:write": "prettier --write \"src/**/*.{css,js,json,jsx,ts,tsx}\"",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@hookform/resolvers": "^3.1.0",
+		"@phosphor-icons/react": "^2.0.9",
+		"@prisma/client": "4.14.0",
+		"@radix-ui/react-avatar": "^1.0.2",
+		"@radix-ui/react-collapsible": "^1.0.2",
+		"@radix-ui/react-dialog": "^1.0.3",
+		"@radix-ui/react-dropdown-menu": "^2.0.4",
+		"@radix-ui/react-label": "^2.0.1",
+		"@radix-ui/react-popover": "^1.0.5",
+		"@radix-ui/react-select": "^1.2.1",
+		"@radix-ui/react-slot": "^1.0.1",
+		"@radix-ui/react-tooltip": "^1.0.6",
+		"@types/node": "20.1.4",
+		"@types/react": "18.2.6",
+		"@types/react-dom": "18.2.4",
+		"autoprefixer": "10.4.14",
+		"class-variance-authority": "^0.6.0",
+		"clsx": "^1.2.1",
+		"cmdk": "^0.2.0",
+		"connectkit": "^1.4",
+		"eslint": "8.40.0",
+		"eslint-config-next": "13.4.2",
+		"iron-session": "^6.3.1",
+		"next": "13.4.4",
+		"postcss": "8.4.23",
+		"react": "18.2.0",
+		"react-dom": "18.2.0",
+		"react-hook-form": "^7.44.2",
+		"react-hot-toast": "^2.4.1",
+		"siwe": "^2.1.4",
+		"tailwind-merge": "^1.12.0",
+		"tailwindcss": "3.3.2",
+		"tailwindcss-animate": "^1.0.5",
+		"tailwindcss-radix": "^2.8.0",
+		"typescript": "5.0.4",
+		"viem": "^0.3.39",
+		"wagmi": "^1.0.9",
+		"zod": "^3.21.4"
+	},
+	"devDependencies": {
+		"prettier": "^2.8.8",
+		"prettier-plugin-sort-imports-desc": "^1.0.0",
+		"prisma": "^4.14.0",
+		"webpack": "^5.84.1"
+	},
+	"prisma": {
+		"schema": "src/db/schema.prisma"
+	}
+}
