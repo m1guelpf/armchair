@@ -37,7 +37,7 @@ https://github.com/m1guelpf/armchair/assets/23558090/fc7af326-5a06-4294-9543-e30
 -   **App Router** – Uses the new Next.js App Router and Server Actions.
 -   **Sign in with your wallet** – Integrates Sign in with Ethereum with server-side sessions and middleware.
 -   **Teams Support** – Includes team support out of the box, with permission handling, team switching, and a team settings page.
--   **Component Library** – Includes reusable components (`Form`, `Dialog`, `Dropdown`, `CommandMeny`, etc.), courtesy of [shadcn/ui](https://ui.shadcn.com/).
+-   **Component Library** – Includes reusable components (`Form`, `Dialog`, `Dropdown`, `CommandMenu`, etc.), courtesy of [shadcn/ui](https://ui.shadcn.com/).
 
 ### Tech Stack
 
