@@ -1,5 +1,5 @@
-import { relations } from 'drizzle-orm'
 import { users } from '@/db/schema/users'
+import { InferModel, relations } from 'drizzle-orm'
 import { mysqlTable, serial, text, varchar, timestamp, mysqlEnum } from 'drizzle-orm/mysql-core'
 
 export const teams = mysqlTable('teams', {
@@ -12,6 +12,9 @@ export const teams = mysqlTable('teams', {
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').onUpdateNow(),
 })
+
+export type Team = InferModel<typeof teams>
+export type NewTeam = InferModel<typeof teams, 'insert'>
 
 export const teamsRelations = relations(teams, ({ many }) => ({
 	members: many(teamMembers),
@@ -26,6 +29,9 @@ export const teamMembers = mysqlTable('team_members', {
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').onUpdateNow(),
 })
+
+export type TeamMember = InferModel<typeof teamMembers>
+export type NewTeamMember = InferModel<typeof teamMembers, 'insert'>
 
 export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
 	team: one(teams, {
