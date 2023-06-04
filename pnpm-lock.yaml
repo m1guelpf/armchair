@@ -13,6 +13,7 @@ specifiers:
   '@radix-ui/react-select': ^1.2.1
   '@radix-ui/react-slot': ^1.0.1
   '@radix-ui/react-tooltip': ^1.0.6
+  '@t3-oss/env-nextjs': ^0.4.0
   '@types/node': 20.1.4
   '@types/react': 18.2.6
   '@types/react-dom': 18.2.4
@@ -59,6 +60,7 @@ dependencies:
   '@radix-ui/react-select': 1.2.2_lhsvdmrfrkqkmxtqosqgyd3k4i
   '@radix-ui/react-slot': 1.0.2_s3k22s5ab4eu26xuel7hiaraxy
   '@radix-ui/react-tooltip': 1.0.6_lhsvdmrfrkqkmxtqosqgyd3k4i
+  '@t3-oss/env-nextjs': 0.4.0_z34kx2cq3kivpffalfeqk2ugre
   '@types/node': 20.1.4
   '@types/react': 18.2.6
   '@types/react-dom': 18.2.4
@@ -2201,6 +2203,27 @@ packages:
     resolution: {integrity: sha512-sJ902EfIzn1Fa+qYmjdQqh8tPsoxyBz+8yBKC2HKUxyezKJFwPGOn7pv4WY6QuQW//ySQi5lJjA/ZT9sNWWNTg==}
     dependencies:
       tslib: 2.5.3
+    dev: false
+
+  /@t3-oss/env-core/0.4.0_z34kx2cq3kivpffalfeqk2ugre:
+    resolution: {integrity: sha512-6JlMp0Vru15q/axHzBKsQQjiyGS6k+EsZBY1iErGVmOGzNSoVluBahnYFP7tEkwZ7KoRgSq4NRIc1Ez7SVYuxQ==}
+    peerDependencies:
+      typescript: '>=4.7.2'
+      zod: ^3.0.0
+    dependencies:
+      typescript: 5.0.4
+      zod: 3.21.4
+    dev: false
+
+  /@t3-oss/env-nextjs/0.4.0_z34kx2cq3kivpffalfeqk2ugre:
+    resolution: {integrity: sha512-K1u2i+S/uEhjfg++FqWlOzS6x237EARRbWGowH2MkDkFu2q7ZJSiJBJT8e47L7NHWH5IyZrTCM6BdOxyWEnQuQ==}
+    peerDependencies:
+      typescript: '>=4.7.2'
+      zod: ^3.0.0
+    dependencies:
+      '@t3-oss/env-core': 0.4.0_z34kx2cq3kivpffalfeqk2ugre
+      typescript: 5.0.4
+      zod: 3.21.4
     dev: false
 
   /@tanstack/query-core/4.29.11:
