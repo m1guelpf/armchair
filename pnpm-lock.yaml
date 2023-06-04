@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@hookform/resolvers': ^3.1.0
   '@phosphor-icons/react': ^2.0.9
+  '@planetscale/database': ^1.7.0
   '@radix-ui/react-avatar': ^1.0.2
   '@radix-ui/react-collapsible': ^1.0.2
   '@radix-ui/react-dialog': ^1.0.3
@@ -48,6 +49,7 @@ specifiers:
 dependencies:
   '@hookform/resolvers': 3.1.0_react-hook-form@7.44.3
   '@phosphor-icons/react': 2.0.9_biqbaboplfbrettd7655fr4n2y
+  '@planetscale/database': 1.7.0
   '@radix-ui/react-avatar': 1.0.3_lhsvdmrfrkqkmxtqosqgyd3k4i
   '@radix-ui/react-collapsible': 1.0.3_lhsvdmrfrkqkmxtqosqgyd3k4i
   '@radix-ui/react-dialog': 1.0.4_lhsvdmrfrkqkmxtqosqgyd3k4i
@@ -65,7 +67,7 @@ dependencies:
   clsx: 1.2.1
   cmdk: 0.2.0_tqcjxml4rosq5qpg5cznikfcd4
   connectkit: 1.4.0_cgktb6lg6oo2vkk4zjuyd4kxrm
-  drizzle-orm: 0.26.5_mysql2@3.3.3
+  drizzle-orm: 0.26.5_lkqzlunljzo6gjacqvaxgkunoi
   eslint: 8.40.0
   eslint-config-next: 13.4.2_3qfatcekpgbllh6uk5ivyhkbxq
   iron-session: 6.3.1_next@13.4.4
@@ -1059,6 +1061,11 @@ packages:
       open: 9.1.0
       picocolors: 1.0.0
       tslib: 2.5.3
+    dev: false
+
+  /@planetscale/database/1.7.0:
+    resolution: {integrity: sha512-lWR6biXChUyQnxsT4RT1CIeR3ZJvwTQXiQ+158MnY3VjLwjHEGakDzdH9kwUGPk6CHvu6UeqRXp1DgUOVHJFTw==}
+    engines: {node: '>=16'}
     dev: false
 
   /@radix-ui/number/1.0.1:
@@ -3923,7 +3930,7 @@ packages:
       - supports-color
     dev: true
 
-  /drizzle-orm/0.26.5_mysql2@3.3.3:
+  /drizzle-orm/0.26.5_lkqzlunljzo6gjacqvaxgkunoi:
     resolution: {integrity: sha512-ajjbOIoXqldWoWBn0RbVQCCT732R4Ad+gUjUrlmMpzWYwgnbG/qqPy84NhHntQ/MR//z3xfvT1Z2fD8uCAPX3g==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
@@ -3985,6 +3992,7 @@ packages:
       sqlite3:
         optional: true
     dependencies:
+      '@planetscale/database': 1.7.0
       mysql2: 3.3.3
     dev: false
 
