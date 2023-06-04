@@ -12,7 +12,6 @@
 	"dependencies": {
 		"@hookform/resolvers": "^3.1.0",
 		"@phosphor-icons/react": "^2.0.9",
-		"@prisma/client": "4.14.0",
 		"@radix-ui/react-avatar": "^1.0.2",
 		"@radix-ui/react-collapsible": "^1.0.2",
 		"@radix-ui/react-dialog": "^1.0.3",
@@ -30,9 +29,11 @@
 		"clsx": "^1.2.1",
 		"cmdk": "^0.2.0",
 		"connectkit": "^1.4",
+		"drizzle-orm": "^0.26.5",
 		"eslint": "8.40.0",
 		"eslint-config-next": "13.4.2",
 		"iron-session": "^6.3.1",
+		"mysql2": "^3.3.3",
 		"next": "13.4.4",
 		"postcss": "8.4.23",
 		"react": "18.2.0",
@@ -50,9 +51,9 @@
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {
+		"drizzle-kit": "^0.18.1",
 		"prettier": "^2.8.8",
 		"prettier-plugin-sort-imports-desc": "^1.0.0",
-		"prisma": "^4.14.0",
 		"webpack": "^5.84.1"
 	},
 	"prisma": {
