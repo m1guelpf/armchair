@@ -41,7 +41,7 @@ https://github.com/m1guelpf/armchair/assets/23558090/fc7af326-5a06-4294-9543-e30
 
 ### Tech Stack
 
--   [Prisma](https://www.prisma.io/) – Typescript-first ORM for Node.js
+-   [Drizzle](https://orm.drizzle.team/) – Typescript-first ORM, but actually it's a query builder
 -   [Tailwind CSS](https://tailwindcss.com/) – Utility-first CSS framework for rapid UI development
 -   [ConnectKit](https://docs.family.co/connectkit) – React component library for connecting a wallet to your dApp
 -   [Radix](https://www.radix-ui.com/) – Primitives like modal, popover, etc. to build a stellar user experience
@@ -53,6 +53,10 @@ https://github.com/m1guelpf/armchair/assets/23558090/fc7af326-5a06-4294-9543-e30
 ## Author
 
 -   Miguel Piedrafita ([@m1guelpf](https://twitter.com/m1guelpf))
+
+## Drizzle version
+
+-   kinsyu ([@kinsyudev](https://twitter.com/kinsyudev))
 
 ## License
 

@@ -1,12 +1,14 @@
+import { db } from '@/db'
 import Link from 'next/link'
-import prisma from '@/db/prisma'
 import Session from '@/lib/session'
 import { error } from '@/lib/errors'
 import Navigation from './Navigation'
 import { cookies } from 'next/headers'
 import { PropsWithChildren } from 'react'
+import { eq, inArray } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import TeamSwitcher from '@/components/TeamSwitcher'
+import { teamMembersTable, teamsTable } from '@/db/schema'
 import { Bell, X, List, Cube } from '@/components/ui/icons'
 import ConnectWallet, { MobileProfileNav } from '@/components/ConnectWallet'
 import Collapsible, { CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible'
@@ -18,23 +20,40 @@ const navigation = [
 
 const DashboardLayout = async ({ children }: PropsWithChildren<{}>) => {
 	const session = await Session.fromCookies(cookies())
-	const user = await prisma.user.findUnique({
-		where: { id: session.userId },
-		select: { teams: { select: { team: true } } },
+	const user = await db.query.usersTable.findFirst({
+		where: (users, { eq }) => eq(users.id, session.userId as string),
+		with: {
+			teams: true,
+		},
 	})
-
 	if (!user) throw new Error('User not found')
 
-	const switchTeam = async (teamId: string) => {
+	const teams =
+		user.teams.length === 0
+			? []
+			: await db
+					.select()
+					.from(teamsTable)
+					.where(
+						inArray(
+							teamsTable.id,
+							user.teams.map(membership => membership.teamId)
+						)
+					)
+
+	const switchTeam = async (teamId: number) => {
 		'use server'
 
 		const session = await Session.fromCookies(cookies())
-		const team = await prisma.team.findUniqueOrThrow({
-			where: { id: teamId },
-			include: { members: { where: { userId: session.userId } } },
+		const team = await db.query.teamsTable.findFirst({
+			where: (teams, { eq }) => eq(teams.id, teamId),
+			with: {
+				members: true,
+			},
 		})
-
+		if (!team) return error('Team not found')
 		if (!team.members.length) return error('You are not a member of this team')
+
 		session.teamId = team.id
 
 		revalidatePath('/dashboard/team-settings')
@@ -45,13 +64,16 @@ const DashboardLayout = async ({ children }: PropsWithChildren<{}>) => {
 		'use server'
 
 		const session = await Session.fromCookies(cookies())
-		const team = await prisma.team.create({
-			data: {
-				name,
-				members: { create: { user: { connect: { id: session.userId } }, role: 'OWNER' } },
-			},
+		const teamInsert = await db.insert(teamsTable).values({
+			name,
 		})
-		session.teamId = team.id
+		const teamMembersInsert = await db.insert(teamMembersTable).values({
+			teamId: Number(teamInsert.insertId),
+			userId: session.userId as string,
+			role: 'owner',
+		})
+
+		session.teamId = Number(teamInsert.insertId)
 
 		revalidatePath('/dashboard/team-settings')
 		await session.persist(cookies())
@@ -74,7 +96,7 @@ const DashboardLayout = async ({ children }: PropsWithChildren<{}>) => {
 											onSwitch={switchTeam}
 											onCreate={createTeam}
 											currentTeamId={session.teamId!}
-											teams={user.teams.map(membership => membership.team)}
+											teams={teams}
 										/>
 									</div>
 									<div className="hidden md:block">

@@ -2,7 +2,7 @@
 
 import * as z from 'zod'
 import { FC } from 'react'
-import { Team } from '@prisma/client'
+import { Team } from '@/db/schema'
 import { APP_NAME } from '@/lib/consts'
 import { toast } from 'react-hot-toast'
 import Input from '@/components/ui/Input'

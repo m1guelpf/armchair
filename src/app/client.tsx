@@ -1,5 +1,6 @@
 'use client'
 
+import { env } from '@/env.mjs'
 import { SiweMessage } from 'siwe'
 import { APP_NAME } from '@/lib/consts'
 import { useRouter } from 'next/navigation'
@@ -11,8 +12,7 @@ import { ConnectKitProvider, SIWEConfig, SIWEProvider, getDefaultConfig, useSIWE
 const config = createConfig(
 	getDefaultConfig({
 		appName: APP_NAME,
-		infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
-		walletConnectProjectId: process.env.NEXT_PUBLIC_WC_ID!,
+		walletConnectProjectId: env.NEXT_PUBLIC_WC_ID,
 	})
 )
 

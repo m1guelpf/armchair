@@ -1,17 +1,20 @@
-import prisma from '@/db/prisma'
+import { db } from '@/db'
+import { eq } from 'drizzle-orm'
 import Session from '@/lib/session'
 import DeleteTeam from './DeleteTeam'
 import { cookies } from 'next/headers'
 import TeamMembers from './TeamMembers'
-import { TeamRole } from '@prisma/client'
+import { teamsTable } from '@/db/schema'
 import { notFound } from 'next/navigation'
 import EditTeamDetails from './EditTeamDetails'
 
 const TeamSettingsPage = async () => {
 	const session = await Session.fromCookies(cookies())
-	const team = await prisma.team.findUnique({
-		include: { members: true },
-		where: { id: session.teamId! },
+	const team = await db.query.teamsTable.findFirst({
+		where: (teams, { eq }) => eq(teams.id, session.teamId!),
+		with: {
+			members: true,
+		},
 	})
 
 	const user = team?.members.find(member => member.userId == session.userId)
