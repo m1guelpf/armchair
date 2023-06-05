@@ -6,7 +6,7 @@ import Label from '@/components/ui/Label'
 import { actionToast } from '@/lib/errors'
 import Button from '@/components/ui/Button'
 import { FC, useMemo, useState } from 'react'
-import { Team, TeamType } from '@prisma/client'
+import { Team, teamsTable } from '@/db/schema'
 import { useAccount, useEnsAvatar, useEnsName } from 'wagmi'
 import { CaretUpDown, Check, PlusCircle } from '@phosphor-icons/react'
 import Avatar, { AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
@@ -56,9 +56,9 @@ const groups = [
 const TeamSwitcher: FC<{
 	className?: string
 	teams: Team[]
-	currentTeamId: string
+	currentTeamId: number
 	onCreate: (name: string) => Promise<unknown>
-	onSwitch: (teamId: string) => Promise<unknown>
+	onSwitch: (teamId: number) => Promise<unknown>
 }> = ({ className, teams, currentTeamId, onSwitch, onCreate }) => {
 	const { address } = useAccount()
 	const { data: ensName } = useEnsName({ address })
@@ -69,9 +69,9 @@ const TeamSwitcher: FC<{
 	const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
 
 	const selectedTeam = useMemo(() => {
-		const team = teams.find(team => team.id == currentTeamId)!
+		const team = teams.find(team => team.id == currentTeamId)
 
-		if (team.type == TeamType.PERSONAL && !team.avatarUrl && userAvatar) {
+		if (team && team.type == teamsTable.type.enumValues['0'] && !team.avatarUrl && userAvatar) {
 			team.avatarUrl = userAvatar
 		}
 
@@ -80,8 +80,8 @@ const TeamSwitcher: FC<{
 
 	const [personalTeam, otherTeams] = useMemo(
 		() => [
-			teams.find(team => team.type === TeamType.PERSONAL),
-			teams.filter(team => team.type !== TeamType.PERSONAL),
+			teams.find(team => team.type === teamsTable.type.enumValues['0']),
+			teams.filter(team => team.type !== teamsTable.type.enumValues['0']),
 		],
 		[teams]
 	)

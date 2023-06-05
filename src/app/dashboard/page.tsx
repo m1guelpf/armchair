@@ -1,4 +1,3 @@
-import prisma from '@/db/prisma'
 import Session from '@/lib/session'
 import { cookies } from 'next/headers'
 import BlockPlaceholder from '@/components/BlockPlaceholder'

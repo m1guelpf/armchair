@@ -12,7 +12,7 @@ import Button from '@/components/ui/Button'
 import { FC, useEffect, useState } from 'react'
 import { inviteUser, updateMember } from './actions'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Team, TeamMember, TeamRole } from '@prisma/client'
+import { Team, TeamMember, TeamRoleType } from '@/db/schema'
 import { CaretDown, CircleNotch, Crown, UserPlus } from '@phosphor-icons/react'
 import Popover, { PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import Command, { CommandGroup, CommandItem, CommandList } from '@/components/ui/Command'
@@ -53,7 +53,7 @@ const formSchema = z.object({
 
 const TeamMembers: FC<{
 	team: TeamWithMembers
-	role: TeamRole
+	role: TeamRoleType
 }> = ({ team, role }) => {
 	const [isPending, setPending] = useState<boolean>(false)
 	const [showInviteMemberDialog, setShowInviteMemberDialog] = useState(false)
@@ -153,15 +153,15 @@ const TeamMembers: FC<{
 }
 
 type MemberProps = {
-	role: TeamRole
+	role: TeamRoleType
 	member: TeamMember
-	performAction: (data: TeamRole | 'delete') => Promise<unknown>
+	performAction: (data: TeamRoleType | 'delete') => Promise<unknown>
 }
 const Member: FC<MemberProps> = ({ member, role, performAction }) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const { data: ensName } = useEnsName({ address: member.userId as `0x${string}` })
 
-	const onUpdate = async (action: TeamRole | 'delete') => {
+	const onUpdate = async (action: TeamRoleType | 'delete') => {
 		setIsOpen(false)
 
 		actionToast(performAction(action), {
@@ -171,14 +171,19 @@ const Member: FC<MemberProps> = ({ member, role, performAction }) => {
 		})
 	}
 
+	const [mounted, setMounted] = useState(false)
+	useEffect(() => {
+		setMounted(true)
+	}, [])
+
 	return (
 		<div className="flex items-center justify-between space-x-4 light">
 			<div className="flex items-center space-x-4">
 				<Avatar address={member.userId as `0x${string}`} size={40} radius={40} />
 				<div>
 					<p className="text-sm font-medium leading-none text-neutral-700 flex items-center">
-						{ensName ?? truncateAddr(member.userId)}
-						{member.role == TeamRole.OWNER && (
+						{mounted && (ensName ?? truncateAddr(member.userId))}
+						{member.role == 'owner' && (
 							<Crown
 								weight="duotone"
 								className="inline-block ml-1 h-4 w-4 text-neutral-600 fill-yellow-500"
@@ -203,16 +208,16 @@ const Member: FC<MemberProps> = ({ member, role, performAction }) => {
 						<CommandList>
 							<CommandGroup>
 								<CommandItem
-									onSelect={() => onUpdate(TeamRole.MEMBER)}
+									onSelect={() => onUpdate('member')}
 									className="teamaspace-y-1 flex flex-col items-start px-4 py-2"
-									disabled={role == TeamRole.MEMBER}
+									disabled={role == 'member'}
 								>
 									<p>Member</p>
 									<p className="text-sm text-muted-foreground">Can create and publish posts.</p>
 								</CommandItem>
 								<CommandItem
-									disabled={role != TeamRole.OWNER}
-									onSelect={() => onUpdate(TeamRole.ADMIN)}
+									disabled={role !== 'owner'}
+									onSelect={() => onUpdate('admin')}
 									className="teamaspace-y-1 flex flex-col items-start px-4 py-2 aria-disabled:opacity-40 aria-disabled:cursor-not-allowed"
 								>
 									<p>Admin</p>
@@ -221,8 +226,8 @@ const Member: FC<MemberProps> = ({ member, role, performAction }) => {
 									</p>
 								</CommandItem>
 								<CommandItem
-									disabled={role != TeamRole.OWNER}
-									onSelect={() => onUpdate(TeamRole.OWNER)}
+									disabled={role !== 'owner'}
+									onSelect={() => onUpdate('owner')}
 									className="teamaspace-y-1 flex flex-col items-start px-4 py-2 aria-disabled:opacity-40 aria-disabled:cursor-not-allowed"
 								>
 									<p>Owner</p>
@@ -230,9 +235,9 @@ const Member: FC<MemberProps> = ({ member, role, performAction }) => {
 										Can create and publish posts, manage members, and delete the team.
 									</p>
 								</CommandItem>
-								{member.role != TeamRole.OWNER && (
+								{member.role !== 'owner' && (
 									<CommandItem
-										disabled={role == TeamRole.MEMBER}
+										disabled={role === 'member'}
 										onSelect={() => onUpdate('delete')}
 										className="teamaspace-y-1 flex flex-col items-start px-4 py-2 aria-selected:bg-red-100 aria-selected:text-red-500 aria-disabled:opacity-40 aria-disabled:cursor-not-allowed"
 									>

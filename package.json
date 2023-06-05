@@ -2,12 +2,14 @@
 	"name": "armchair",
 	"version": "0.1.0",
 	"scripts": {
-		"dev": "prisma generate && next dev",
+		"dev": "next dev",
 		"format": "prettier \"src/**/*.{css,js,json,jsx,ts,tsx}\"",
-		"build": "prisma generate && prisma db push && next build",
+		"build": "next build",
 		"format:write": "prettier --write \"src/**/*.{css,js,json,jsx,ts,tsx}\"",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"db:push": "drizzle-kit push:mysql",
+		"db:check": "drizzle-kit check:mysql"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.1.0",

@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast'
 import { actionToast } from '@/lib/errors'
 import Button from '@/components/ui/Button'
 import { FC, FormEvent, useState } from 'react'
-import { Team, TeamRole } from '@prisma/client'
+import { Team, TeamRoleType } from '@/db/schema'
 import Card, { CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import Dialog, {
 	DialogContent,
@@ -16,7 +16,7 @@ import Dialog, {
 	DialogTrigger,
 } from '@/components/ui/Dialog'
 
-const DeleteTeam: FC<{ team: Team; role: TeamRole }> = ({ team, role }) => {
+const DeleteTeam: FC<{ team: Team; role: TeamRoleType }> = ({ team, role }) => {
 	const [isOpen, setOpen] = useState<boolean>(false)
 
 	const handleDelete = async (event: FormEvent) => {
@@ -41,7 +41,7 @@ const DeleteTeam: FC<{ team: Team; role: TeamRole }> = ({ team, role }) => {
 					<DialogTrigger asChild>
 						<Button
 							variant="outline"
-							disabled={role != TeamRole.OWNER}
+							disabled={role !== 'owner'}
 							className="hover:bg-red-500 hover:text-red-50 hover:border-red-500"
 						>
 							Delete Team

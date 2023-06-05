@@ -8,12 +8,10 @@ export const env = createEnv({
 	},
 	client: {
 		NEXT_PUBLIC_WC_ID: z.string().min(1),
-		NEXT_PUBLIC_INFURA_ID: z.string().min(1),
 	},
 	runtimeEnv: {
 		DATABASE_URL: process.env.DATABASE_URL,
 		SESSION_SECRET: process.env.SESSION_SECRET,
 		NEXT_PUBLIC_WC_ID: process.env.NEXT_PUBLIC_WC_ID,
-		NEXT_PUBLIC_INFURA_ID: process.env.NEXT_PUBLIC_INFURA_ID,
 	},
 })

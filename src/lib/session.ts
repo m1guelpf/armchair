@@ -11,13 +11,13 @@ export const SESSION_OPTIONS = {
 
 export type ISession = {
 	nonce?: string
-	teamId?: string
+	teamId?: number
 	userId?: string
 }
 
 class Session {
 	nonce?: string
-	teamId?: string
+	teamId?: number
 	userId?: string
 
 	constructor(session?: ISession) {

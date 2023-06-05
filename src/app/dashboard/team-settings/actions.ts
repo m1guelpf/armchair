@@ -1,22 +1,29 @@
 'use server'
 
+import { db } from '@/db'
 import { isAddress } from 'viem'
-import prisma from '@/db/prisma'
 import Session from '@/lib/session'
+import { number, string } from 'zod'
+import { and, eq } from 'drizzle-orm'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { error, isError } from '@/lib/errors'
 import { getAddressFromENS } from '@/lib/utils'
-import { TeamRole, TeamType } from '@prisma/client'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
+import { TeamMember, teamMembersTable, teamsTable } from '@/db/schema'
 
 const ensurePermissions = async (session: Session) => {
-	const member = await prisma.teamMember.findUniqueOrThrow({
-		select: { role: true },
-		where: { userId_teamId: { userId: session.userId!, teamId: session.teamId! } },
-	})
+	const memebers = await db
+		.select({
+			role: teamMembersTable.role,
+		})
+		.from(teamMembersTable)
+		.where(and(eq(teamMembersTable.userId, session.userId!), eq(teamMembersTable.teamId, session.teamId!)))
 
-	if (member.role != TeamRole.OWNER && member.role != TeamRole.ADMIN) {
+	const member = memebers[0]
+	if (
+		member.role !== teamMembersTable.role.enumValues['0'] &&
+		member.role !== teamMembersTable.role.enumValues['1']
+	) {
 		return error("You don't have permission to perform this action.")
 	}
 
@@ -31,14 +38,13 @@ export const inviteUser = async ({ address }: { address: string }) => {
 	if (!isAddress(resolvedAddress)) return error('Invalid address.')
 
 	try {
-		await prisma.teamMember.create({
-			data: {
-				team: { connect: { id: session.teamId! } },
-				user: { connectOrCreate: { where: { id: resolvedAddress }, create: { id: resolvedAddress } } },
-			},
+		if (!session.teamId) return error('No team found')
+		if (!session.userId) return error('No user found')
+		await db.insert(teamMembersTable).values({
+			userId: resolvedAddress,
+			teamId: session.teamId,
 		})
 	} catch (e) {
-		if ((e as PrismaClientKnownRequestError)?.code != 'P2002') throw error
 		return error('User is already a member of this team.')
 	}
 
@@ -49,41 +55,59 @@ export const updateTeamData = async ({ name, avatarUrl }: { name: string; avatar
 	const session = await Session.fromCookies(cookies())
 	await ensurePermissions(session)
 
-	await prisma.team.update({
-		data: { name, avatarUrl },
-		where: { id: session.teamId! },
-	})
+	await db
+		.update(teamsTable)
+		.set({
+			name,
+			avatarUrl,
+		})
+		.where(eq(teamsTable.id, session.teamId!))
 
 	revalidatePath('/dashboard/team-settings')
 }
 
-export const updateMember = async (userId: string, action: TeamRole | 'delete') => {
+type actionType = (typeof teamMembersTable.role.enumValues)[number] | 'delete'
+
+export const updateMember = async (userId: string, action: actionType) => {
 	const session = await Session.fromCookies(cookies())
 	const userRole = await ensurePermissions(session)
 	if (isError(userRole)) return userRole
 
-	const [team, member] = await Promise.all([
-		await prisma.team.findUniqueOrThrow({ where: { id: session.teamId! } }),
-		await prisma.teamMember.findUniqueOrThrow({
-			where: { userId_teamId: { userId: userId, teamId: session.teamId! } },
-		}),
-	])
-
-	if (member.role == TeamRole.OWNER) return error("You can't modify the owner.")
-	if (member.role == TeamRole.ADMIN && userRole != TeamRole.OWNER) {
-		if (member.userId != session.userId || action == TeamRole.OWNER) return error("You can't modify admins.")
-	}
-
-	if (action == 'delete') {
-		await prisma.teamMember.delete({
-			where: { userId_teamId: { userId: member.userId, teamId: session.teamId! } },
+	const transaction = await db.transaction(async tx => {
+		const team = await tx.query.teamsTable.findFirst({
+			where: (teamsTable, { eq }) => eq(teamsTable.id, session.teamId!),
 		})
+		if (!team) return error('Team not found.')
+		const teamMember = await tx.query.teamMembersTable.findFirst({
+			where: (teamMembersTable, { and, eq }) =>
+				and(eq(teamMembersTable.userId, userId), eq(teamMembersTable.teamId, session.teamId!)),
+		})
+		if (!teamMember) return error('User not found.')
+		return { team, teamMember }
+	})
 
-		if (member.userId == session.userId) {
-			const personalTeam = await prisma.team.findFirstOrThrow({
-				where: { type: TeamType.PERSONAL, members: { some: { userId: session.userId! } } },
+    console.log(transaction)
+
+	if (isError(transaction)) return error('Failed to load team or user.')
+	const { team, teamMember } = transaction
+
+	if (teamMember.role === 'owner') return error("You can't modify the owner.")
+	if (teamMember.role === 'admin' && userRole !== 'owner') return error("You can't modify admins.")
+
+	if (action === 'delete') {
+		await db
+			.delete(teamMembersTable)
+			.where(and(eq(teamMembersTable.userId, userId), eq(teamMembersTable.teamId, session.teamId!)))
+
+		if (teamMember.userId == session.userId) {
+			const userTeams = await db.query.teamMembersTable.findMany({
+				where: (teamMembersTable, { eq, and }) => eq(teamMembersTable.userId, session.userId!),
+				with: {
+					team: true,
+				},
 			})
-			session.teamId = personalTeam.id
+			const personalTeam = userTeams.find(team => team.team.type == 'personal')
+			if (personalTeam) session.teamId = personalTeam.team.id
 			await session.persist(cookies())
 		}
 
@@ -91,19 +115,19 @@ export const updateMember = async (userId: string, action: TeamRole | 'delete') 
 	}
 
 	// Unset previous owner
-	if (action == TeamRole.OWNER) {
-		if (team.type == TeamType.PERSONAL) return error("You can't transfer ownership of a personal team.")
+	if (action === 'owner') {
+		if (team.type == 'personal') return error("You can't transfer ownership of a personal team.")
 
-		await prisma.teamMember.updateMany({
-			data: { role: TeamRole.ADMIN },
-			where: { teamId: session.teamId!, role: TeamRole.OWNER },
-		})
+		await db
+			.update(teamMembersTable)
+			.set({ role: 'admin' })
+			.where(and(eq(teamMembersTable.teamId, session.teamId!), eq(teamMembersTable.role, 'owner')))
 	}
 
-	await prisma.teamMember.update({
-		data: { role: action },
-		where: { userId_teamId: { userId: member.userId, teamId: session.teamId! } },
-	})
+	await db
+		.update(teamMembersTable)
+		.set({ role: action })
+		.where(and(eq(teamMembersTable.userId, userId), eq(teamMembersTable.teamId, session.teamId!)))
 
 	revalidatePath('/dashboard/team-settings')
 }
@@ -112,17 +136,26 @@ export const deleteTeam = async () => {
 	const session = await Session.fromCookies(cookies())
 	const role = await ensurePermissions(session)
 
-	const team = await prisma.team.findUniqueOrThrow({ where: { id: session.teamId! } })
-
-	if (team.type == TeamType.PERSONAL) return error("You can't delete a personal team.")
-	if (role != TeamRole.OWNER) return error("You don't have permission to perform this action.")
-
-	await prisma.team.delete({ where: { id: session.teamId! } })
-
-	const personalTeam = await prisma.team.findFirstOrThrow({
-		where: { type: TeamType.PERSONAL, members: { some: { userId: session.userId! } } },
+	const team = await db.query.teamsTable.findFirst({
+		where: (teamsTable, { eq }) => eq(teamsTable.id, session.teamId!),
+		columns: {
+			type: true,
+		},
 	})
-	session.teamId = personalTeam.id
+
+	if (team?.type === 'personal') return error("You can't delete a personal team.")
+	if (role !== 'owner') return error("You don't have permission to perform this action.")
+
+	await db.delete(teamMembersTable).where(eq(teamMembersTable.teamId, session.teamId!))
+
+	const userTeams = await db.query.teamMembersTable.findMany({
+		where: (teamMembersTable, { eq, and }) => eq(teamMembersTable.userId, session.userId!),
+		with: {
+			team: true,
+		},
+	})
+	const personalTeam = userTeams.find(team => team.team.type == 'personal')
+	if (personalTeam) session.teamId = personalTeam.team.id
 
 	await session.persist(cookies())
 	revalidatePath('/dashboard')
