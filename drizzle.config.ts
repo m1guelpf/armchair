@@ -3,5 +3,6 @@ import type { Config } from 'drizzle-kit'
 export default {
 	schema: './src/db/schema.ts',
 	out: './drizzle',
-	connectionString: `mysql://hdihxg50j4mb4h3cu6yv:pscale_pw_NQetYNDeLcxAvlJQwMguuIIlIHhs2ikXUnw4lfpVYDW@aws.connect.psdb.cloud/arboretum?ssl={"rejectUnauthorized":true}`,
+	// it has to be hardcoded here cause for some reason drizzle-kit doesn't have access to env variables ¯\_(ツ)_/¯
+	connectionString: `your-connection-string`,
 } satisfies Config
